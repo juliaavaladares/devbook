@@ -4,39 +4,41 @@ import (
 	"devbook-api/src/banco"
 	"devbook-api/src/modelos"
 	"devbook-api/src/repositorio"
+	"devbook-api/src/respostas"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 func CriaUsuario(w http.ResponseWriter, r *http.Request) {
 	corpoRequest, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		respostas.RespondeComErro(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	var usuario modelos.Usuario
 	err = json.Unmarshal(corpoRequest, &usuario)
 	if err != nil {
-		log.Fatal(err)
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
 	}
 
 	db, err := banco.Conectar()
 	if err != nil {
-		log.Fatal(err)
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
 	}
 	defer db.Close()
 
 	repositorio := repositorio.NovoRepositorioUsuarios(db)
-	usuarioId, err := repositorio.CriaUsuario(usuario)
+	usuario.ID, err = repositorio.CriaUsuario(usuario)
 	if err != nil {
-		log.Fatal(err)
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	mensagem := fmt.Sprintf("Ultimo id inserido: %d", usuarioId)
-	w.Write([]byte(mensagem))
+	respostas.RespondeComJson(w, http.StatusCreated, usuario)
 }
 
 func BuscaUsuarios(w http.ResponseWriter, r *http.Request) {
