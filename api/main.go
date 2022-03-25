@@ -1,6 +1,7 @@
 package main
 
 import (
+	"devbook-api/src/config"
 	"devbook-api/src/router"
 	"fmt"
 	"log"
@@ -8,8 +9,10 @@ import (
 )
 
 func main() {
+	config.Carregar()
 	fmt.Println("Rodando api...")
 
 	r := router.Gerar()
-	log.Fatal(http.ListenAndServe(":5000", r))
+	porta := fmt.Sprintf(":%d", config.Porta)
+	log.Fatal(http.ListenAndServe(porta, r))
 }
