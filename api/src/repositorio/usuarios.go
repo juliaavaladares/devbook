@@ -3,6 +3,7 @@ package repositorio
 import (
 	"database/sql"
 	"devbook-api/src/modelos"
+	"fmt"
 )
 
 type Usuarios struct {
@@ -32,4 +33,30 @@ func (u Usuarios) CriaUsuario(usuario modelos.Usuario) (int64, error) {
 	}
 
 	return ultimoIdInserido, nil
+}
+
+func (u Usuarios) BuscaUsuario(nomeOuNick string) ([]modelos.Usuario, error) {
+	nomeOuNick = fmt.Sprintf("%%%s%%", nomeOuNick)
+
+	scripts := IniciaScripts()
+	query := scripts.BuscaUsuarios
+
+	linhas, err := u.db.Query(query, nomeOuNick, nomeOuNick)
+	if err != nil {
+		return nil, err
+	}
+	defer linhas.Close()
+
+	var usuarios []modelos.Usuario
+	for linhas.Next() {
+		var usuario modelos.Usuario
+		err := linhas.Scan(&usuario.ID, &usuario.Nome, &usuario.Nick, &usuario.Email, &usuario.CriadoEm)
+		if err != nil {
+			return nil, err
+		}
+
+		usuarios = append(usuarios, usuario)
+	}
+
+	return usuarios, nil
 }
