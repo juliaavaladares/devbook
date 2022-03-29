@@ -60,3 +60,48 @@ func (u Usuarios) BuscaUsuario(nomeOuNick string) ([]modelos.Usuario, error) {
 
 	return usuarios, nil
 }
+
+func (u Usuarios) BuscaUsuarioPorId(id int64) (modelos.Usuario, error) {
+	scripts := IniciaScripts()
+	query := scripts.BuscaUsuarioPorId
+
+	linhas, err := u.db.Query(query, id)
+	if err != nil {
+		return modelos.Usuario{}, err
+	}
+	defer linhas.Close()
+
+	var usuario modelos.Usuario
+	if linhas.Next() {
+		err := linhas.Scan(
+			&usuario.ID,
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+			&usuario.CriadoEm,
+		)
+		if err != nil {
+			return modelos.Usuario{}, err
+		}
+	}
+
+	return usuario, nil
+}
+
+func (u Usuarios) AtualizaUsuario(id int64, usuario modelos.Usuario) error {
+	scripts := IniciaScripts()
+	query := scripts.AtualizaUsuario
+
+	statement, err := u.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(usuario.Nome, usuario.Nick, usuario.Email, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

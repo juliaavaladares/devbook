@@ -9,10 +9,14 @@ import (
 func RespondeComJson(w http.ResponseWriter, statusCode int, dados interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	err := json.NewEncoder(w).Encode(dados)
-	if err != nil {
-		log.Fatal(err)
+
+	if dados != nil {
+		err := json.NewEncoder(w).Encode(dados)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
 }
 
 func RespondeComErro(w http.ResponseWriter, statusCode int, erro error) {
