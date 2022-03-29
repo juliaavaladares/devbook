@@ -139,5 +139,27 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.RespondeComJson(w, http.StatusNoContent, nil)
 }
 func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Deleta usuarios usuario!"))
+	params := mux.Vars(r)
+	usuarioId, err := strconv.ParseInt(params["usuarioId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioUsuarios(db)
+	err = repositorio.DeletaUsuario(usuarioId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusNoContent, nil)
+
 }

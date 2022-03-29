@@ -105,3 +105,21 @@ func (u Usuarios) AtualizaUsuario(id int64, usuario modelos.Usuario) error {
 
 	return nil
 }
+
+func (u Usuarios) DeletaUsuario(id int64) error {
+	scripts := IniciaScripts()
+	query := scripts.DeletaUsuario
+
+	statement, err := u.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

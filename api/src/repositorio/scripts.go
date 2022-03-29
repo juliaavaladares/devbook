@@ -5,6 +5,7 @@ type Scripts struct {
 	BuscaUsuarios     string
 	BuscaUsuarioPorId string
 	AtualizaUsuario   string
+	DeletaUsuario     string
 }
 
 func IniciaScripts() Scripts {
@@ -14,6 +15,7 @@ func IniciaScripts() Scripts {
 	scripts.BuscaUsuarios = `select id, nome, nick, email, criadoEm from usuarios where nome LIKE ? or nick LIKE ?`
 	scripts.BuscaUsuarioPorId = `select id, nome, nick, email, criadoEm from usuarios where id = ?`
 	scripts.AtualizaUsuario = `update usuarios set nome = ?, nick = ?, email = ?, where id = ?`
+	scripts.DeletaUsuario = `delete from usuarios where id = ?`
 
 	return scripts
 }
