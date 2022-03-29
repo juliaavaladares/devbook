@@ -1,6 +1,7 @@
 package modelos
 
 import (
+	"devbook-api/src/seguranca"
 	"errors"
 	"strings"
 	"time"
@@ -22,7 +23,11 @@ func (usuario *Usuario) Preparar(etapa string) error {
 		return err
 	}
 
-	usuario.formatar()
+	err := usuario.formatar(etapa)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -51,8 +56,19 @@ func (usuario *Usuario) validar(etapa string) error {
 	return nil
 }
 
-func (usuario *Usuario) formatar() {
+func (usuario *Usuario) formatar(etapa string) error {
 	usuario.Nome = strings.TrimSpace(usuario.Nome)
 	usuario.Nick = strings.TrimSpace(usuario.Nick)
 	usuario.Email = strings.TrimSpace(usuario.Email)
+
+	if etapa == "cadastro" {
+		senhaComHash, err := seguranca.Hash(usuario.Senha)
+		if err != nil {
+			return err
+		}
+
+		usuario.Senha = string(senhaComHash)
+	}
+
+	return nil
 }
