@@ -123,3 +123,26 @@ func (u Usuarios) DeletaUsuario(id int64) error {
 
 	return nil
 }
+
+func (u Usuarios) BuscaUsuarioPorEmail(email string) (modelos.Usuario, error) {
+	scripts := IniciaScripts()
+	query := scripts.BuscaUsuarioPorEmail
+
+	linha, err := u.db.Query(query, email)
+	if err != nil {
+		return modelos.Usuario{}, err
+	}
+	defer linha.Close()
+
+	var usuario modelos.Usuario
+	if linha.Next() {
+		err := linha.Scan(
+			&usuario.ID,
+			&usuario.Senha,
+		)
+		if err != nil {
+			return modelos.Usuario{}, err
+		}
+	}
+	return usuario, nil
+}
