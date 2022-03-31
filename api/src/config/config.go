@@ -12,6 +12,7 @@ import (
 var (
 	StringConexaoBanco = ""
 	Porta              = 0
+	SecretKey          []byte
 )
 
 func Carregar() {
@@ -32,5 +33,7 @@ func Carregar() {
 	db_name := os.Getenv("DB_NAME")
 
 	StringConexaoBanco = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True", user, password, db_name)
+
+	SecretKey = []byte(os.Getenv("SECRET_ENV"))
 
 }

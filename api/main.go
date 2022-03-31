@@ -10,9 +10,9 @@ import (
 
 func main() {
 	config.Carregar()
-	fmt.Println("Rodando api...")
-
 	r := router.Gerar()
+
 	porta := fmt.Sprintf(":%d", config.Porta)
+	fmt.Printf("Escutando na porta %s", porta)
 	log.Fatal(http.ListenAndServe(porta, r))
 }

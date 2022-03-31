@@ -17,7 +17,7 @@ func IniciaScripts() Scripts {
 	scripts.BuscaUsuarioPorId = `select id, nome, nick, email, criadoEm from usuarios where id = ?`
 	scripts.AtualizaUsuario = `update usuarios set nome = ?, nick = ?, email = ?, where id = ?`
 	scripts.DeletaUsuario = `delete from usuarios where id = ?`
-	scripts.BuscaUsuarios = `select id, senha from usuarios where email = ?`
+	scripts.BuscaUsuarioPorEmail = `select id, senha from usuarios where email = ?`
 
 	return scripts
 }
