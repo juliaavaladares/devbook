@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"devbook-api/src/autenticacao"
 	"devbook-api/src/banco"
 	"devbook-api/src/modelos"
 	"devbook-api/src/repositorio"
 	"devbook-api/src/respostas"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -29,7 +31,7 @@ func CriaUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = usuario.Preparar("cadastro"); err != nil {
-		respostas.RespondeComErro(w, http.StatusBadRequest, nil)
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -75,7 +77,7 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	usuarioId, err := strconv.ParseInt(params["usuarioId"], 10, 64)
 	if err != nil {
-		respostas.RespondeComErro(w, http.StatusBadRequest, nil)
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -100,13 +102,24 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	corpoRequest, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		respostas.RespondeComErro(w, http.StatusUnprocessableEntity, nil)
+		respostas.RespondeComErro(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	usuarioId, err := strconv.ParseInt(params["usuarioId"], 10, 64)
 	if err != nil {
-		respostas.RespondeComErro(w, http.StatusBadRequest, nil)
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	usuarioIdNoToken, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if usuarioId != usuarioIdNoToken {
+		respostas.RespondeComErro(w, http.StatusForbidden, errors.New("nao é possível atualizar usuario que nao seja o seu"))
 		return
 	}
 
@@ -118,7 +131,7 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = usuario.Preparar("atualizacao"); err != nil {
-		respostas.RespondeComErro(w, http.StatusBadRequest, nil)
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
 		return
 	}
 
