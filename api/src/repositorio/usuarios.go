@@ -182,3 +182,33 @@ func (u Usuarios) PararDeSeguirUsuario(usuarioId, seguidorId int64) error {
 
 	return nil
 }
+
+func (u Usuarios) BuscaSeguidores(usuarioId int64) ([]modelos.Usuario, error) {
+	scripts := IniciaScripts()
+	query := scripts.BuscaSeguidores
+
+	linhas, err := u.db.Query(query, usuarioId)
+	if err != nil {
+		return nil, err
+	}
+	defer linhas.Close()
+
+	var usuarios []modelos.Usuario
+	for linhas.Next() {
+		var usuario modelos.Usuario
+		err := linhas.Scan(
+			&usuario.ID,
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+			&usuario.CriadoEm,
+		)
+		if err != nil {
+			return nil, err
+		}
+		usuarios = append(usuarios, usuario)
+
+	}
+
+	return usuarios, nil
+}
