@@ -187,3 +187,79 @@ func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.RespondeComJson(w, http.StatusNoContent, nil)
 
 }
+
+func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
+	seguidorId, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	parametros := mux.Vars(r)
+	usuarioId, err := strconv.ParseInt(parametros["usuarioId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if usuarioId == seguidorId {
+		erro := errors.New("nao é possível seguir voce mesmo")
+		respostas.RespondeComErro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioUsuarios(db)
+	err = repositorio.SeguirUsuario(usuarioId, seguidorId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusNoContent, nil)
+
+}
+
+func PararDeSeguirUsuario(w http.ResponseWriter, r *http.Request) {
+	seguidorId, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	parametros := mux.Vars(r)
+	usuarioId, err := strconv.ParseInt(parametros["usuarioId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if usuarioId == seguidorId {
+		erro := errors.New("nao é possível deixar de seguir voce mesmo")
+		respostas.RespondeComErro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioUsuarios(db)
+	err = repositorio.PararDeSeguirUsuario(usuarioId, seguidorId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusNoContent, nil)
+
+}

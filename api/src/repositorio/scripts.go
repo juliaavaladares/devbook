@@ -7,6 +7,8 @@ type Scripts struct {
 	AtualizaUsuario      string
 	DeletaUsuario        string
 	BuscaUsuarioPorEmail string
+	SeguirUsuario        string
+	PararDeSeguirUsuario string
 }
 
 func IniciaScripts() Scripts {
@@ -18,6 +20,8 @@ func IniciaScripts() Scripts {
 	scripts.AtualizaUsuario = `update usuarios set nome = ?, nick = ?, email = ?, where id = ?`
 	scripts.DeletaUsuario = `delete from usuarios where id = ?`
 	scripts.BuscaUsuarioPorEmail = `select id, senha from usuarios where email = ?`
+	scripts.SeguirUsuario = `insert ignore into seguidores (usuario_id, seguidor_id) values (?, ?)`
+	scripts.PararDeSeguirUsuario = `delete from seguidores where usuario_id = ? and seguidor_id = ?`
 
 	return scripts
 }

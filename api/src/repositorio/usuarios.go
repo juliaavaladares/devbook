@@ -146,3 +146,39 @@ func (u Usuarios) BuscaUsuarioPorEmail(email string) (modelos.Usuario, error) {
 	}
 	return usuario, nil
 }
+
+func (u Usuarios) SeguirUsuario(usuarioId, seguidorId int64) error {
+	scripts := IniciaScripts()
+	query := scripts.SeguirUsuario
+
+	statement, err := u.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(usuarioId, seguidorId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u Usuarios) PararDeSeguirUsuario(usuarioId, seguidorId int64) error {
+	scripts := IniciaScripts()
+	query := scripts.PararDeSeguirUsuario
+
+	statement, err := u.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(usuarioId, seguidorId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
