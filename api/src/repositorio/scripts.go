@@ -10,6 +10,7 @@ type Scripts struct {
 	SeguirUsuario        string
 	PararDeSeguirUsuario string
 	BuscaSeguidores      string
+	BuscaSeguindo        string
 }
 
 func IniciaScripts() Scripts {
@@ -28,6 +29,13 @@ func IniciaScripts() Scripts {
   								from
 									usuarios u
 									inner join seguidores on u.id = s.seguidor_id
+  								where
+									usuario_id = ?`
+	scripts.BuscaSeguindo = ` select u.id, u.nome,
+									u.nick, u.email, u.criadoEm
+  								from
+									usuarios u
+									inner join seguidores on u.id = s.usuario_id
   								where
 									usuario_id = ?`
 
