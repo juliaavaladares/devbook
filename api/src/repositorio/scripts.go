@@ -11,6 +11,8 @@ type Scripts struct {
 	PararDeSeguirUsuario string
 	BuscaSeguidores      string
 	BuscaSeguindo        string
+	BuscaSenha           string
+	AtualizaSenha        string
 }
 
 func IniciaScripts() Scripts {
@@ -38,6 +40,8 @@ func IniciaScripts() Scripts {
 									inner join seguidores on u.id = s.usuario_id
   								where
 									usuario_id = ?`
+	scripts.BuscaSenha = `select senha from usuarios where id = ?`
+	scripts.BuscaSenha = `update usuarios set senha = ? where id = ?`
 
 	return scripts
 }

@@ -6,6 +6,7 @@ import (
 	"devbook-api/src/modelos"
 	"devbook-api/src/repositorio"
 	"devbook-api/src/respostas"
+	"devbook-api/src/seguranca"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -313,5 +314,72 @@ func BuscaSeguindo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.RespondeComJson(w, http.StatusOK, usuarios)
+
+}
+
+func AtualizaSenha(w http.ResponseWriter, r *http.Request) {
+	var senha modelos.Senha
+
+	usuarioIdNoToken, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	parametros := mux.Vars(r)
+	usuarioId, err := strconv.ParseInt(parametros["usuarioId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if usuarioIdNoToken != usuarioId {
+		respostas.RespondeComErro(w, http.StatusForbidden, errors.New("não é possivel atualizar um usuario que não seja o seu"))
+		return
+	}
+
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = json.Unmarshal(corpoRequisicao, &senha)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioUsuarios(db)
+	senhaSalvaNoBanco, err := repositorio.BuscaSenha(usuarioId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = seguranca.VerificarSenha(senhaSalvaNoBanco, senha.Atual)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, errors.New("a senha atual nao condiz com a que está salva"))
+		return
+	}
+
+	senhaComHash, err := seguranca.Hash(senha.Nova)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = repositorio.AtualizaSenha(usuarioId, string(senhaComHash))
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusNoContent, nil)
 
 }

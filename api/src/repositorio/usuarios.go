@@ -242,3 +242,42 @@ func (u Usuarios) BuscaSeguindo(usuarioId int64) ([]modelos.Usuario, error) {
 
 	return usuarios, nil
 }
+
+func (u Usuarios) BuscaSenha(usuarioId int64) (string, error) {
+	scripts := IniciaScripts()
+	query := scripts.BuscaSenha
+
+	linhas, err := u.db.Query(query, usuarioId)
+	if err != nil {
+		return "", err
+	}
+	defer linhas.Close()
+
+	var usuario modelos.Usuario
+	if linhas.Next() {
+		err := linhas.Scan(&usuario.Senha)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return usuario.Senha, nil
+}
+
+func (u Usuarios) AtualizaSenha(usuarioId int64, senha string) error {
+	scripts := IniciaScripts()
+	query := scripts.AtualizaSenha
+
+	statement, err := u.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(senha, usuarioId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
