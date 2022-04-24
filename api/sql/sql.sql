@@ -29,13 +29,13 @@ CREATE TABLE seguidores (
     primary key(usuario_id, seguidor_id)
 ) ENGINE=INNODB;
 
-CREATE TABLE usuarios(
+CREATE TABLE publicacoes(
     id int auto_increment primary key,
     titulo varchar(50) not null,
     conteudo varchar(300) not null unique,
 
     autor_id int not null,  
-    FOREIGN key (usuario_id)
+    FOREIGN key (autor_id)
     REFERENCES usuarios(id)
     ON DELETE CASCADE,
 

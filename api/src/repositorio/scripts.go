@@ -13,6 +13,7 @@ type Scripts struct {
 	BuscaSeguindo        string
 	BuscaSenha           string
 	AtualizaSenha        string
+	CriaPublicacao       string
 }
 
 func IniciaScripts() Scripts {
@@ -42,6 +43,7 @@ func IniciaScripts() Scripts {
 									usuario_id = ?`
 	scripts.BuscaSenha = `select senha from usuarios where id = ?`
 	scripts.BuscaSenha = `update usuarios set senha = ? where id = ?`
+	scripts.CriaPublicacao = `insert into publicacoes (titulo, conteudo, autor_id) values (?, ?, ?)`
 
 	return scripts
 }
