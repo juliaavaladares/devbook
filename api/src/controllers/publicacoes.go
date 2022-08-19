@@ -63,7 +63,30 @@ func CriaPublicacao(w http.ResponseWriter, r *http.Request) {
 
 }
 func BuscaPublicacoes(w http.ResponseWriter, r *http.Request) {
+	var publicacoes []modelos.Publicacao
 
+	usuarioId, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	defer db.Close()
+
+	respositorio := repositorio.NovoRepositorioPublicacoes(db)
+	publicacoes, err = respositorio.BuscaPublicacoes(usuarioId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusCreated, publicacoes)
 }
 func BuscaPublicacao(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)

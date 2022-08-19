@@ -63,3 +63,35 @@ func (p Publicacoes) BuscaPublicacao(publicacaoId int64) (modelos.Publicacao, er
 
 	return publicacao, nil
 }
+func (p Publicacoes) BuscaPublicacoes(publicacaoId int64) ([]modelos.Publicacao, error) {
+	var publicacoes []modelos.Publicacao
+
+	scripts := IniciaScripts()
+	query := scripts.BuscaPublicacoes
+
+	linhas, err := p.db.Query(query, publicacaoId, publicacaoId)
+	if err != nil {
+		return publicacoes, err
+	}
+	defer linhas.Close()
+
+	for linhas.Next() {
+		var publicacao modelos.Publicacao
+		err := linhas.Scan(
+			&publicacao.Id,
+			&publicacao.Titulo,
+			&publicacao.Conteudo,
+			&publicacao.AutorId,
+			&publicacao.Curtidas,
+			&publicacao.CriadoEm,
+			&publicacao.AutorNick,
+		)
+		if err != nil {
+			return nil, err
+		}
+		publicacoes = append(publicacoes, publicacao)
+
+	}
+
+	return publicacoes, nil
+}

@@ -15,6 +15,7 @@ type Scripts struct {
 	AtualizaSenha        string
 	CriaPublicacao       string
 	BuscaPublicacao      string
+	BuscaPublicacoes     string
 }
 
 func IniciaScripts() Scripts {
@@ -46,6 +47,12 @@ func IniciaScripts() Scripts {
 	scripts.BuscaSenha = `update usuarios set senha = ? where id = ?`
 	scripts.CriaPublicacao = `insert into publicacoes (titulo, conteudo, autor_id) values (?, ?, ?)`
 	scripts.BuscaPublicacao = ` select p.*, u.nick from publicacoes p inner join usuarios u on u.id = p.autor_id where p.id = ? `
+	scripts.BuscaPublicacoes = ` select distinct p.*, u.nick 
+									from publicacoes p 
+									inner join usuarios u on u.id = p.autor_id 
+									inner join seguidores s on p.autor_id = s.usuario_id 
+									where u.id = ? or s.seguidor_id = ?
+									order by 1 desc `
 
 	return scripts
 }

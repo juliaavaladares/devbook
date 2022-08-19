@@ -42,3 +42,9 @@ CREATE TABLE publicacoes(
     curtidas int default 0,
     criadoEm timestamp default current_timestamp()
 ) ENGINE=INNODB;
+
+insert into publicacoes (titulo, conteudo, autor_id)
+values
+("Publicacao do usuario 1", "Publicacao usuario 1: Oba!", 1),
+("Publicacao do usuario 2", "Publicacao usuario 2: Oba!", 2),
+("Publicacao do usuario 3", "Publicacao usuario 3: Oba!", 3),
