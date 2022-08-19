@@ -7,6 +7,7 @@ import (
 	"devbook-api/src/repositorio"
 	"devbook-api/src/respostas"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -114,6 +115,64 @@ func BuscaPublicacao(w http.ResponseWriter, r *http.Request) {
 
 }
 func AtualizaPublicacao(w http.ResponseWriter, r *http.Request) {
+	var publicacao modelos.Publicacao
+
+	usuarioId, err := autenticacao.ExtraiUsuarioId(r)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	params := mux.Vars(r)
+	publicacaoId, err := strconv.ParseInt(params["publicacaoId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioPublicacoes(db)
+	publicacaoSalvaNoBanco, err := repositorio.BuscaPublicacao(publicacaoId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if publicacaoSalvaNoBanco.AutorId != usuarioId {
+		respostas.RespondeComErro(w, http.StatusForbidden, errors.New("nao é possível atualizar publicacao que nao seja sua"))
+		return
+	}
+
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	err = json.Unmarshal(corpoRequisicao, &publicacao)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	err = publicacao.Preparar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = repositorio.AtualizaPublicacao(publicacaoId, publicacao)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusNoContent, nil)
 
 }
 func DeletaPublicacao(w http.ResponseWriter, r *http.Request) {

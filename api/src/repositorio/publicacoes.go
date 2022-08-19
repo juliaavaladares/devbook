@@ -95,3 +95,11 @@ func (p Publicacoes) BuscaPublicacoes(publicacaoId int64) ([]modelos.Publicacao,
 
 	return publicacoes, nil
 }
+func (p Publicacoes) AtualizaPublicacao(publicacaoId int64, publicacao modelos.Publicacao) error {
+	scripts := IniciaScripts()
+	query := scripts.AtualizaPublicacao
+
+	_, err := p.db.Exec(query, publicacao.Titulo, publicacao.Conteudo, publicacaoId)
+
+	return err
+}
