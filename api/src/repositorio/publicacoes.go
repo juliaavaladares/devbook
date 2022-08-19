@@ -34,3 +34,32 @@ func (p Publicacoes) CriaPublicacao(publicacao modelos.Publicacao) (int64, error
 
 	return ultimoIdInserido, nil
 }
+
+func (p Publicacoes) BuscaPublicacao(publicacaoId int64) (modelos.Publicacao, error) {
+	var publicacao modelos.Publicacao
+
+	scripts := IniciaScripts()
+	query := scripts.BuscaPublicacao
+
+	linha, err := p.db.Query(query, publicacaoId)
+	if err != nil {
+		return publicacao, err
+	}
+	defer linha.Close()
+
+	if linha.Next() {
+		if err = linha.Scan(
+			&publicacao.Id,
+			&publicacao.Titulo,
+			&publicacao.Conteudo,
+			&publicacao.AutorId,
+			&publicacao.Curtidas,
+			&publicacao.CriadoEm,
+			&publicacao.AutorNick,
+		); err != nil {
+			return publicacao, err
+		}
+	}
+
+	return publicacao, nil
+}
