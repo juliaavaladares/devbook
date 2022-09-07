@@ -20,6 +20,7 @@ type Scripts struct {
 	DeletaPublicacao           string
 	BuscaPublicacoesPorUsuario string
 	CurtirPublicacao           string
+	DescurtirPublicacao        string
 }
 
 func IniciaScripts() Scripts {
@@ -64,5 +65,9 @@ func IniciaScripts() Scripts {
 									join usuarios u on u.id = p.autor_id 
 									where p.autor_id = ?`
 	scripts.CurtirPublicacao = ` update publicacoes set curtidas = curtidas + 1 where id = ?`
+	scripts.CurtirPublicacao = ` update publicacoes set curtidas = 
+								CASE WHEN curtidas > 0 THEN curtidas - 1
+								ELSE curtidas END 
+								where id = ?`
 	return scripts
 }

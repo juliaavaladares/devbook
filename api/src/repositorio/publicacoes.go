@@ -156,3 +156,11 @@ func (p Publicacoes) CurtirPublicacao(publicacaoId int64) error {
 
 	return err
 }
+func (p Publicacoes) DescurtirPublicacao(publicacaoId int64) error {
+	scripts := IniciaScripts()
+	query := scripts.DescurtirPublicacao
+
+	_, err := p.db.Exec(query, publicacaoId)
+
+	return err
+}
