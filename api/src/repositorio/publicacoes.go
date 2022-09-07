@@ -103,3 +103,12 @@ func (p Publicacoes) AtualizaPublicacao(publicacaoId int64, publicacao modelos.P
 
 	return err
 }
+
+func (p Publicacoes) DeletaPublicacao(publicacaoId int64) error {
+	scripts := IniciaScripts()
+	query := scripts.DeletaPublicacao
+
+	_, err := p.db.Exec(query, publicacaoId)
+
+	return err
+}

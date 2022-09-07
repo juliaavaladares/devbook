@@ -17,6 +17,7 @@ type Scripts struct {
 	BuscaPublicacao      string
 	BuscaPublicacoes     string
 	AtualizaPublicacao   string
+	DeletaPublicacao     string
 }
 
 func IniciaScripts() Scripts {
@@ -49,6 +50,7 @@ func IniciaScripts() Scripts {
 	scripts.CriaPublicacao = `insert into publicacoes (titulo, conteudo, autor_id) values (?, ?, ?)`
 	scripts.BuscaPublicacao = ` select p.*, u.nick from publicacoes p inner join usuarios u on u.id = p.autor_id where p.id = ? `
 	scripts.AtualizaPublicacao = ` update publicacoes set titulo = ?, conteudo = ? where id = ? `
+	scripts.DeletaPublicacao = `delete from publicacoes where id = ? `
 	scripts.BuscaPublicacoes = ` select distinct p.*, u.nick 
 									from publicacoes p 
 									inner join usuarios u on u.id = p.autor_id 
