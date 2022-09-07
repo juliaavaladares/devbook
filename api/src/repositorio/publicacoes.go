@@ -147,3 +147,12 @@ func (p Publicacoes) BuscaPublicacoesPorUsuario(usuarioId int64) ([]modelos.Publ
 
 	return publicacoes, nil
 }
+
+func (p Publicacoes) CurtirPublicacao(publicacaoId int64) error {
+	scripts := IniciaScripts()
+	query := scripts.CurtirPublicacao
+
+	_, err := p.db.Exec(query, publicacaoId)
+
+	return err
+}
