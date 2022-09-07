@@ -1,23 +1,24 @@
 package repositorio
 
 type Scripts struct {
-	CriaUsuario          string
-	BuscaUsuarios        string
-	BuscaUsuarioPorId    string
-	AtualizaUsuario      string
-	DeletaUsuario        string
-	BuscaUsuarioPorEmail string
-	SeguirUsuario        string
-	PararDeSeguirUsuario string
-	BuscaSeguidores      string
-	BuscaSeguindo        string
-	BuscaSenha           string
-	AtualizaSenha        string
-	CriaPublicacao       string
-	BuscaPublicacao      string
-	BuscaPublicacoes     string
-	AtualizaPublicacao   string
-	DeletaPublicacao     string
+	CriaUsuario                string
+	BuscaUsuarios              string
+	BuscaUsuarioPorId          string
+	AtualizaUsuario            string
+	DeletaUsuario              string
+	BuscaUsuarioPorEmail       string
+	SeguirUsuario              string
+	PararDeSeguirUsuario       string
+	BuscaSeguidores            string
+	BuscaSeguindo              string
+	BuscaSenha                 string
+	AtualizaSenha              string
+	CriaPublicacao             string
+	BuscaPublicacao            string
+	BuscaPublicacoes           string
+	AtualizaPublicacao         string
+	DeletaPublicacao           string
+	BuscaPublicacoesPorUsuario string
 }
 
 func IniciaScripts() Scripts {
@@ -57,6 +58,9 @@ func IniciaScripts() Scripts {
 									inner join seguidores s on p.autor_id = s.usuario_id 
 									where u.id = ? or s.seguidor_id = ?
 									order by 1 desc `
-
+	scripts.BuscaPublicacoes = ` select distinct p.*, u.nick 
+									from publicacoes p 
+									join usuarios u on u.id = p.autor_id 
+									where p.autor_id = ?`
 	return scripts
 }

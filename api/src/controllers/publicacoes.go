@@ -63,6 +63,7 @@ func CriaPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.RespondeComJson(w, http.StatusCreated, publicacao)
 
 }
+
 func BuscaPublicacoes(w http.ResponseWriter, r *http.Request) {
 	var publicacoes []modelos.Publicacao
 
@@ -89,6 +90,7 @@ func BuscaPublicacoes(w http.ResponseWriter, r *http.Request) {
 
 	respostas.RespondeComJson(w, http.StatusCreated, publicacoes)
 }
+
 func BuscaPublicacao(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	publicacaoId, err := strconv.ParseInt(params["publicacaoId"], 10, 64)
@@ -217,4 +219,29 @@ func DeletaPublicacao(w http.ResponseWriter, r *http.Request) {
 
 	respostas.RespondeComJson(w, http.StatusNoContent, nil)
 
+}
+
+func BuscaPublicacoesPorUsuario(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	usuarioId, err := strconv.ParseInt(params["usuarioId"], 10, 64)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := banco.Conectar()
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorio.NovoRepositorioPublicacoes(db)
+	publicacoes, err := repositorio.BuscaPublicacoesPorUsuario(usuarioId)
+	if err != nil {
+		respostas.RespondeComErro(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respostas.RespondeComJson(w, http.StatusOK, publicacoes)
 }
